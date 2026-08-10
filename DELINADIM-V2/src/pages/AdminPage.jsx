@@ -10,7 +10,6 @@ const AdminPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Escuchar el estado de autenticación de Firebase
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -71,7 +70,6 @@ const AdminPage = () => {
     return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
   }
 
-  // Si no ha iniciado sesión con Firebase, muestra el formulario de correo
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -105,14 +103,14 @@ const AdminPage = () => {
     );
   }
 
-  // Panel de administración protegido con Firebase Auth
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      {/* Cabecera con el título y el botón de Cerrar Sesión bien ubicado */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Panel de Administración - Delinadim</h1>
         <button
           onClick={handleLogout}
-          className="bg-red-100 text-red-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors"
+          className="bg-red-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-600 transition-colors shadow-sm"
         >
           Cerrar Sesión
         </button>
