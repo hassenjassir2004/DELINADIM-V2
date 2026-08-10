@@ -96,7 +96,8 @@ const CartModal = ({ isOpen, onClose }) => {
 
         // AQUÍ ESTÁ LA MAGIA: Abre Mercado Pago en una pestaña separada
         if (data.sandbox_init_point) {
-          window.open(data.sandbox_init_point, "_blank");
+  window.location.href = data.sandbox_init_point;
+}
           // Opcional: cerramos el modal del carrito una vez que se van a pagar
           onClose(); 
         } else {
