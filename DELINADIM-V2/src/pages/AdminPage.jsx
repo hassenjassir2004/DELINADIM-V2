@@ -1,51 +1,127 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
-import { db } from "../firebase";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { db, auth } from "../firebase";
 
-const AdminPanel = () => {
+const AdminPage = () => {
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // 1. Cargar pedidos en tiempo real o al montar el componente
-  const fetchOrders = async () => {
-    const querySnapshot = await getDocs(collection(db, "pedidos"));
-   const list = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setOrders(list);
-  };
-
+  // Escuchar el estado de autenticación de Firebase
   useEffect(() => {
-  fetchOrders();
-}, []);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        fetchOrders();
+      }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  // 2. Función para cambiar el estado del pedido
-  const handleUpdateStatus = async (id, newStatus) => {
-    const orderRef = doc(db, "pedidos", id);
-    await updateDoc(orderRef, { status: newStatus });
-    fetchOrders(); // Recargar lista
-  };
-
-  // 3. Función para eliminar un pedido
-  const handleDeleteOrder = async (id) => {
-    if (confirm("¿Estás seguro de eliminar este pedido?")) {
-      await deleteDoc(doc(db, "pedidos", id));
-      fetchOrders(); // Recargar lista
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      alert("Correo o contraseña incorrectos.");
     }
   };
 
-  // 4. Calcular total de ventas del día
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "pedidos"));
+      const list = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setOrders(list);
+    } catch (error) {
+      console.error("Error al cargar pedidos:", error);
+    }
+  };
+
+  const handleUpdateStatus = async (id, newStatus) => {
+    const orderRef = doc(db, "pedidos", id);
+    await updateDoc(orderRef, { status: newStatus });
+    fetchOrders();
+  };
+
+  const handleDeleteOrder = async (id) => {
+    if (confirm("¿Estás seguro de eliminar este pedido?")) {
+      await deleteDoc(doc(db, "pedidos", id));
+      fetchOrders();
+    }
+  };
+
   const totalVentasHoy = orders.reduce((acc, order) => {
     return acc + (order.total || 0);
   }, 0);
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+  }
+
+  // Si no ha iniciado sesión con Firebase, muestra el formulario de correo
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm">
+          <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Admin - Delinadim</h2>
+          <p className="text-sm text-gray-500 mb-6 text-center">Inicia sesión con tu cuenta autorizada</p>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-2 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-2 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-bold hover:bg-gray-800 transition-colors"
+          >
+            Iniciar Sesión
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // Panel de administración protegido con Firebase Auth
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-wine">Panel de Administración - Delinadim</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Panel de Administración - Delinadim</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-100 text-red-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-200 transition-colors"
+        >
+          Cerrar Sesión
+        </button>
+      </div>
       
-      {/* Resumen de Ventas */}
       <div className="bg-gray-100 p-4 rounded-xl mb-6 shadow-sm">
         <p className="text-lg font-semibold">Total Acumulado en Pedidos: ${new Intl.NumberFormat("es-CO").format(totalVentasHoy)} COP</p>
       </div>
 
-      {/* Lista de Pedidos */}
       <div className="space-y-4">
         {orders.map((order) => (
           <div key={order.id} className="bg-white p-4 rounded-xl shadow border flex justify-between items-center">
@@ -76,4 +152,4 @@ const AdminPanel = () => {
   );
 };
 
-export default AdminPanel;
+export default AdminPage;
