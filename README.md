@@ -9,7 +9,7 @@
 
 ## 🌍 Access Links / Enlaces en Vivo
 
-* **🌐 Live Frontend Application:** delinadim-v2-szc3.vercel.app
+* **🌐 Live Frontend Application:** {delinadim-v2-szc3.vercel.app)
 * **⚙️ Backend API Service:** [https://delinadim-backend.onrender.com](https://delinadim-backend.onrender.com)
 
 ---
