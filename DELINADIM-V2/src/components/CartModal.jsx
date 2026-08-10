@@ -82,7 +82,7 @@ const CartModal = ({ isOpen, onClose }) => {
         });
 
       } else if (paymentMethod === "online") {
-        const response = await fetch("https://delinadim-backend.onrender.com", {
+        const response = await fetch("https://delinadim-backend.onrender.com/create_preference", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
