@@ -2,7 +2,7 @@
 
 > A modern, high-performance full-stack web application built for Middle Eastern food ordering, featuring a dynamic customized menu, real-time database integration, and a secure payment gateway.
 
-[![Live Demo](https://img.shields.io/badge/Status-Live%20Demo-success?style=for-the-badge&logo=vercel)](https://delinadim-v2.vercel.app)
+[![Live Demo](https://delinadim-v2-szc3.vercel.app/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 ---
