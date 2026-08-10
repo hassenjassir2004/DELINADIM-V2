@@ -11,6 +11,7 @@ import ContactPage from "./pages/ContactPage";
 import CartWidget from "./components/CartWidget";
 // 🛡️ NUEVO: Importamos tu panel de administración
 import AdminPage from "./pages/AdminPage";
+<Route path="/admin" element={<AdminPage />} />
 
 // --- Componentes Icono para Botones Flotantes (Rutas de Assets) ---
 const WhatsappIcon = ({ size = "w-6 h-6" }) => (
