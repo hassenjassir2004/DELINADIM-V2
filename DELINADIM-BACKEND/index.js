@@ -9,6 +9,10 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.status(200).send("Servidor activo");
+});
+
 // Lee la llave de forma segura desde el archivo .env
 const client = new MercadoPagoConfig({ accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN });
 app.post("/create_preference", async (req, res) => {
